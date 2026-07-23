@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迷你世界 0.52.1 - 星辉之门</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky:#3FB8EF;
+    --sky-deep:#1E82C4;
+    --grass:#5FCB5A;
+    --grass-deep:#3B9E36;
+    --sun:#FFD23F;
+    --sun-deep:#F2A900;
+    --ink:#173A5E;
+    --cream:#FFF8E7;
+    --panel:#0E2A46;
+    --tg:#37AEE2;
+    --tg-deep:#1E7FB8;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Noto Sans SC', sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(180deg, rgba(10,30,55,.35), rgba(10,30,55,.55)),
+      url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd1F2_EbtI881dHPsiX_-OfcpoXZca427gvDIXTmLaXp6sIaGhcxtjgQI&s=10') center/cover fixed no-repeat;
+    min-height:100%;
+    overflow-x:hidden;
+  }
+
+  /* ---------- MODE TOGGLE ---------- */
+  .mode-toggle{
+    position:fixed; top:14px; right:16px; z-index:100;
+    background:var(--panel);
+    color:var(--sun);
+    border:3px solid var(--sun);
+    border-radius:24px;
+    padding:9px 18px;
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    font-size:14px;
+    cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,.35);
+    user-select:none;
+    transition:transform .1s;
+  }
+  .mode-toggle:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.35); }
+
+  /* ---------- HEADER (mobile/default) ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:14px;
+    padding:10px 22px;
+    background:linear-gradient(180deg, var(--panel), #0a1f36);
+    border-bottom:5px solid var(--sun);
+    box-shadow:0 4px 0 rgba(0,0,0,.25);
+  }
+  header img.logo{
+    width:52px; height:52px; border-radius:12px;
+    border:3px solid var(--sun);
+    box-shadow:0 3px 0 var(--sun-deep);
+    object-fit:cover;
+  }
+  header .brand{
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    color:var(--cream);
+    line-height:1.15;
+  }
+  header .brand .b1{ font-size:22px; letter-spacing:1px; text-shadow:2px 2px 0 var(--sky-deep);}
+  header .brand .b2{ font-size:12px; color:var(--sun); opacity:.9;}
+
+  /* ---------- NEWS TICKER ---------- */
+  .ticker-wrap{
+    position:relative;
+    background:repeating-linear-gradient(45deg, var(--sun) 0 18px, var(--sun-deep) 18px 36px);
+    border-top:3px solid #fff;
+    border-bottom:3px solid #fff;
+    height:40px;
+    overflow:hidden;
+    box-shadow:inset 0 0 0 2px rgba(0,0,0,.1);
+  }
+  .ticker-wrap::before{
+    content:"最新公告";
+    position:absolute; left:0; top:0; bottom:0;
+    display:flex; align-items:center;
+    padding:0 14px;
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    font-size:14px;
+    color:#fff;
+    background:var(--grass-deep);
+    box-shadow:3px 0 6px rgba(0,0,0,.25);
+    z-index:2;
+  }
+  .ticker-track{
+    position:absolute; top:0; left:0; height:100%;
+    display:flex; align-items:center;
+    white-space:nowrap;
+    animation:slide 16s linear infinite;
+    padding-left:100%;
+    font-weight:700;
+    color:var(--panel);
+    font-size:15px;
+    text-shadow:1px 1px 0 rgba(255,255,255,.4);
+  }
+  @keyframes slide{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(200%); }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    text-align:center;
+    padding:46px 20px 30px;
+  }
+  .hero h1{
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    font-size:clamp(32px, 6vw, 58px);
+    color:var(--cream);
+    -webkit-text-stroke:2px var(--sky-deep);
+    text-shadow:4px 4px 0 var(--grass-deep), 0 0 30px rgba(0,0,0,.4);
+    letter-spacing:2px;
+  }
+  .hero p{
+    margin-top:10px;
+    color:var(--cream);
+    font-size:16px;
+    background:rgba(14,42,70,.55);
+    display:inline-block;
+    padding:8px 18px;
+    border-radius:20px;
+    border:2px solid var(--sun);
+  }
+
+  /* ---------- SECTION TITLE ---------- */
+  .section-title{
+    text-align:center;
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    font-size:26px;
+    color:var(--cream);
+    margin:40px 0 18px;
+    text-shadow:2px 2px 0 var(--sky-deep);
+  }
+  .section-title::before, .section-title::after{
+    content:"◆";
+    color:var(--sun);
+    margin:0 10px;
+    font-size:14px;
+  }
+
+  /* ---------- CAROUSEL (mobile) ---------- */
+  .carousel{
+    max-width:760px;
+    margin:0 auto 20px;
+    position:relative;
+    border:6px solid var(--cream);
+    border-radius:16px;
+    box-shadow:0 10px 0 rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.4);
+    overflow:hidden;
+    background:#000;
+  }
+  .carousel-track{
+    display:flex;
+    transition:transform .5s cubic-bezier(.65,0,.35,1);
+    height:min(56vw, 420px);
+  }
+  .carousel-track img{
+    width:100%; flex-shrink:0; height:100%; object-fit:cover;
+  }
+  .car-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:var(--sun); color:var(--panel);
+    border:3px solid #fff; border-radius:50%;
+    width:42px; height:42px; font-size:20px; font-weight:900;
+    cursor:pointer; box-shadow:0 3px 0 var(--sun-deep);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .car-btn:hover{ background:#fff; }
+  .car-prev{ left:12px; } .car-next{ right:12px; }
+  .dots{
+    display:flex; justify-content:center; gap:10px; margin-top:14px;
+  }
+  .dot{
+    width:14px; height:14px; border-radius:4px;
+    background:var(--panel); border:2px solid var(--cream);
+    cursor:pointer; opacity:.6;
+    transition:.2s;
+  }
+  .dot.active{ background:var(--sun); opacity:1; transform:scale(1.15); }
+
+  /* ---------- GALLERY GRID (pc only) ---------- */
+  .gallery-grid{
+    display:none;
+    max-width:1040px;
+    margin:0 auto 10px;
+    grid-template-columns:repeat(2, 1fr);
+    gap:18px;
+    padding:0 20px;
+  }
+  .gallery-grid figure{
+    position:relative; margin:0; overflow:hidden;
+    border:5px solid var(--cream); border-radius:14px;
+    box-shadow:0 8px 0 rgba(0,0,0,.3);
+  }
+  .gallery-grid img{
+    width:100%; height:260px; object-fit:cover; display:block;
+    transition:transform .35s ease;
+  }
+  .gallery-grid figure:hover img{ transform:scale(1.08); }
+  .gallery-grid figcaption{
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(0deg, rgba(0,0,0,.65), transparent);
+    color:#fff; font-size:13px; padding:16px 12px 8px;
+    font-family:'ZCOOL KuaiLe', sans-serif;
+  }
+
+  /* ---------- DOWNLOADS ---------- */
+  .downloads{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:22px;
+    padding:20px 20px 60px;
+  }
+  .dl-btn{
+    display:flex; align-items:center; gap:12px;
+    text-decoration:none;
+    padding:16px 30px;
+    border-radius:14px;
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    font-size:20px;
+    color:#fff;
+    border:3px solid rgba(255,255,255,.85);
+    box-shadow:0 6px 0 rgba(0,0,0,.35);
+    transition:transform .12s ease;
+    min-width:230px;
+    justify-content:center;
+  }
+  .dl-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.35); }
+  .dl-btn small{
+    display:block; font-family:'Noto Sans SC',sans-serif; font-size:11px; font-weight:400; opacity:.85;
+  }
+  .dl-android{ background:linear-gradient(180deg, var(--grass), var(--grass-deep)); }
+  .dl-windows{ background:linear-gradient(180deg, var(--sky), var(--sky-deep)); }
+  .dl-telegram{ background:linear-gradient(180deg, var(--tg), var(--tg-deep)); }
+  .dl-btn svg{ width:30px; height:30px; flex-shrink:0; }
+
+  footer{
+    text-align:center;
+    padding:18px;
+    color:var(--cream);
+    font-size:12px;
+    background:rgba(10,25,45,.6);
+  }
+
+  @media (max-width:480px){
+    header .brand .b1{ font-size:18px; }
+    .hero p{ font-size:13px; }
+    .dl-btn{ min-width:200px; font-size:17px; padding:14px 20px;}
+  }
+
+  /* =========================================================
+     PC MODE — отдельный интерфейс "лаунчера" для компьютера
+     ========================================================= */
+  body.pc-mode{
+    display:flex;
+    min-height:100vh;
+  }
+  body.pc-mode .site{
+    display:flex;
+    width:100%;
+  }
+
+  /* Боковая панель вместо шапки */
+  body.pc-mode header{
+    position:fixed; top:0; left:0; bottom:0; z-index:60;
+    width:250px; height:100vh;
+    flex-direction:column; align-items:flex-start;
+    gap:18px;
+    padding:30px 22px;
+    border-bottom:none;
+    border-right:5px solid var(--sun);
+    box-shadow:6px 0 0 rgba(0,0,0,.25);
+  }
+  body.pc-mode header img.logo{ width:74px; height:74px; }
+  body.pc-mode header .brand .b1{ font-size:24px; }
+  body.pc-mode .pc-nav{
+    display:flex; flex-direction:column; gap:6px;
+    margin-top:20px; width:100%;
+  }
+  body.pc-mode .pc-nav a{
+    color:var(--cream); text-decoration:none;
+    font-size:14px; padding:10px 14px;
+    border-radius:10px;
+    background:rgba(255,255,255,.06);
+    border-left:4px solid transparent;
+    transition:.15s;
+  }
+  body.pc-mode .pc-nav a:hover{
+    background:rgba(255,255,255,.14);
+    border-left-color:var(--sun);
+  }
+  body.pc-mode .pc-status{
+    margin-top:auto;
+    font-size:11px;
+    color:var(--sun);
+    background:rgba(0,0,0,.25);
+    padding:8px 10px;
+    border-radius:8px;
+    line-height:1.6;
+    width:100%;
+  }
+
+  /* Основной контент сдвигается вправо от сайдбара */
+  body.pc-mode main{
+    margin-left:250px;
+    width:calc(100% - 250px);
+  }
+  body.pc-mode .ticker-wrap{ margin-left:0; }
+
+  /* Hero становится широким блоком с описанием слева */
+  body.pc-mode .hero{
+    text-align:left;
+    display:flex; align-items:center; justify-content:space-between;
+    max-width:1100px; margin:0 auto;
+    padding:56px 40px 40px;
+  }
+  body.pc-mode .hero .hero-text{ max-width:560px; }
+  body.pc-mode .hero h1{ font-size:52px; }
+  body.pc-mode .hero p{ display:block; margin-top:16px; }
+  body.pc-mode .hero-badge{
+    font-family:'ZCOOL KuaiLe', sans-serif;
+    background:var(--sun);
+    color:var(--panel);
+    border-radius:16px;
+    padding:20px 26px;
+    box-shadow:0 8px 0 var(--sun-deep);
+    font-size:18px;
+    text-align:center;
+    transform:rotate(-3deg);
+  }
+  body.pc-mode .hero-badge b{ display:block; font-size:30px; }
+
+  /* Показываем сетку скриншотов, прячем карусель */
+  body.pc-mode .carousel{ display:none; }
+  body.pc-mode .gallery-grid{ display:grid; }
+
+  /* Кнопки скачивания — панель лаунчера */
+  body.pc-mode .downloads{
+    max-width:1100px; margin:0 auto;
+    justify-content:flex-start;
+    background:rgba(14,42,70,.55);
+    border-radius:18px;
+    padding:26px;
+    border:2px solid rgba(255,255,255,.15);
+  }
+  body.pc-mode .dl-btn{ min-width:260px; }
+
+  @media (max-width:900px){
+    body.pc-mode header{ position:relative; width:100%; height:auto; flex-direction:row; padding:14px 20px; }
+    body.pc-mode .pc-nav{ display:none; }
+    body.pc-mode main{ margin-left:0; width:100%; }
+    body.pc-mode .hero{ flex-direction:column; text-align:center; }
+    body.pc-mode .gallery-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mode-toggle" id="modeToggle">🖥️ 电脑版界面</div>
+
+<div class="site" id="site">
+
+  <header>
+    <img class="logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVRzuz30aEKgIl9v7BXwF49t6beiTOkV65CI8_0olskg&s=10" alt="迷你世界图标">
+    <div class="brand">
+      <div class="b1">迷你世界星辉阁</div>
+      <div class="b2">MINI WORLD · 沙盒创造乐园</div>
+    </div>
+    <nav class="pc-nav">
+      <a href="#hero-anchor">首页概览</a>
+      <a href="#shots-anchor">游戏截图</a>
+      <a href="#dl-anchor">下载中心</a>
+      <a href="https://t.me/miniworld0521" target="_blank" rel="noopener">Telegram 频道</a>
+    </nav>
+    <div class="pc-status">当前版本 0.52.1<br>电脑客户端专属界面</div>
+  </header>
+
+  <main>
+    <div class="ticker-wrap">
+      <div class="ticker-track">0.52.1 版本新增了皮肤并修复了错误，但遗憾的是下载客户端有所不同。):</div>
+    </div>
+
+    <section class="hero" id="hero-anchor">
+      <div class="hero-text">
+        <h1>迷你世界 0.52.1</h1>
+        <p>全新皮肤上线 · 星辉巨献 · 立即探索你的方块世界</p>
+      </div>
+      <div class="hero-badge">最新版本<b>0.52.1</b></div>
+    </section>
+
+    <h2 class="section-title" id="shots-anchor">游戏截图</h2>
+
+    <!-- Мобильная карусель -->
+    <div class="carousel">
+      <div class="carousel-track" id="carTrack">
+        <img src="https://pic.hncj.com/up/2025-6/17508159195614912.png" alt="截图1">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUKSSi3aOt727x-bP4j8_PCEl-rnuc0BPzRgXbjSVj4w&s" alt="截图2">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbN-JayJLmtTAaRNEnVRJRlyI24KKfogyO_jkrM9K0PrE58n3qfNzdv-5c&s=10" alt="截图3">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReaEJmSYK7yAnctk0h07qO77wWBB38shrXYP8KwVDwbQ&s" alt="截图4">
+      </div>
+      <button class="car-btn car-prev" onclick="moveCar(-1)">‹</button>
+      <button class="car-btn car-next" onclick="moveCar(1)">›</button>
+    </div>
+    <div class="dots" id="dots"></div>
+
+    <!-- ПК-сетка -->
+    <div class="gallery-grid">
+      <figure><img src="https://pic.hncj.com/up/2025-6/17508159195614912.png" alt="截图1"><figcaption>星辉建筑一览</figcaption></figure>
+      <figure><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUKSSi3aOt727x-bP4j8_PCEl-rnuc0BPzRgXbjSVj4w&s" alt="截图2"><figcaption>新皮肤展示</figcaption></figure>
+      <figure><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbN-JayJLmtTAaRNEnVRJRlyI24KKfogyO_jkrM9K0PrE58n3qfNzdv-5c&s=10" alt="截图3"><figcaption>冒险场景</figcaption></figure>
+      <figure><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReaEJmSYK7yAnctk0h07qO77wWBB38shrXYP8KwVDwbQ&s" alt="截图4"><figcaption>创造模式</figcaption></figure>
+    </div>
+
+    <h2 class="section-title" id="dl-anchor">立即下载</h2>
+    <div class="downloads">
+      <a class="dl-btn dl-android" href="https://www.mediafire.com/file/ti3hu7a2uail2yc/%E8%BF%B7%E4%BD%A0%E4%B8%96%E7%95%8C+0.52.1-38.apk/file" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67a.637.637 0 0 0-.87-.2c-.28.16-.38.53-.22.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+        <span>安卓版下载<small>APK 手机安装包</small></span>
+      </a>
+      <a class="dl-btn dl-windows" href="https://www.mediafire.com/file/b3otxtspdivlnrm/%E8%BF%B7%E4%BD%A0%E4%B8%96%E7%95%8C%E6%98%9F%E8%BE%89%E9%98%810.52.1.exe" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.1L10.6 4v7.5H3V5.1zM11.5 3.9L21 2.5v9H11.5V3.9zM3 12.5h7.6V20L3 18.9v-6.4zM11.5 12.5H21V21l-9.5-1.3v-7.2z"/></svg>
+        <span>电脑版下载<small>Windows 客户端 EXE</small></span>
+      </a>
+      <a class="dl-btn dl-telegram" href="https://t.me/miniworld0521" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 2.9a1.5 1.5 0 0 0-1.53-.24L2.4 9.68c-.86.33-.85 1.55.02 1.86l4.53 1.6 1.75 5.6c.24.77 1.22.98 1.76.38l2.44-2.7 4.62 3.4c.68.5 1.65.13 1.82-.7l3.15-15.1c.1-.5-.06-.98-.44-1.14zM9.6 14.3l-1.02-3.27 8.9-5.53c.18-.11.36.14.2.28L9.6 14.3z"/></svg>
+        <span>加入 Telegram 频道<small>第一手更新与交流</small></span>
+      </a>
+    </div>
+  </main>
+
+</div>
+
+<footer>
+  © 2026 迷你世界星辉阁 · 本站为非官方粉丝展示页面 · 当前版本 0.52.1
+</footer>
+
+<script>
+  // ---------- Carousel (mobile) ----------
+  const track = document.getElementById('carTrack');
+  const imgs = track.children.length;
+  let idx = 0;
+  const dotsWrap = document.getElementById('dots');
+  for(let i=0;i<imgs;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0 ? ' active' : '');
+    d.onclick = () => { idx = i; render(); };
+    dotsWrap.appendChild(d);
+  }
+  function render(){
+    track.style.transform = `translateX(-${idx*100}%)`;
+    [...dotsWrap.children].forEach((d,i)=> d.classList.toggle('active', i===idx));
+  }
+  function moveCar(dir){
+    idx = (idx + dir + imgs) % imgs;
+    render();
+  }
+  setInterval(()=> { if(!document.body.classList.contains('pc-mode')) moveCar(1); }, 4000);
+
+  // ---------- PC / Mobile mode toggle ----------
+  const toggleBtn = document.getElementById('modeToggle');
+  function applyMode(isPc){
+    document.body.classList.toggle('pc-mode', isPc);
+    toggleBtn.textContent = isPc ? '📱 手机版界面' : '🖥️ 电脑版界面';
+  }
+  toggleBtn.addEventListener('click', () => {
+    applyMode(!document.body.classList.contains('pc-mode'));
+  });
+  // По умолчанию на широких экранах сразу открываем ПК-интерфейс
+  applyMode(window.innerWidth > 1000);
+</script>
+
+</body>
+</html>
