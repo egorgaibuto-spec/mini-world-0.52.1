@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>迷你世界 0.52.1 - 星辉冒险版</title>
+<style>
+  :root{
+    --sky:#2fb6e0;
+    --sky-deep:#1a7fb0;
+    --sun:#ffcb3d;
+    --grass:#5fd15a;
+    --grass-deep:#2f9e3a;
+    --panel:#fff8e6;
+    --ink:#2b3a4a;
+    --android:#3fbb4d;
+    --android-deep:#2c9a39;
+    --windows:#2f8ff0;
+    --windows-deep:#1f6fc9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    font-family:"Microsoft YaHei","PingFang SC","Heiti SC",sans-serif;
+    color:var(--ink);
+    background:#7fd6ef;
+  }
+  body{
+    background-image:url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd1F2_EbtI881dHPsiX_-OfcpoXZca427gvDIXTmLaXp6sIaGhcxtjgQI&s=10");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    min-height:100vh;
+    position:relative;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:linear-gradient(180deg, rgba(30,140,190,0.35) 0%, rgba(20,90,130,0.25) 40%, rgba(20,60,90,0.55) 100%);
+    z-index:0;
+    pointer-events:none;
+  }
+
+  /* ===== 顶部图标 ===== */
+  .top-logo{
+    position:fixed;
+    top:14px;
+    left:16px;
+    z-index:50;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:rgba(255,255,255,0.85);
+    padding:6px 16px 6px 6px;
+    border-radius:50px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+    border:3px solid #ffe488;
+  }
+  .top-logo img{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:block;
+    object-fit:cover;
+    border:2px solid #fff;
+  }
+  .top-logo span{
+    font-weight:900;
+    font-size:16px;
+    color:var(--sky-deep);
+    letter-spacing:1px;
+    text-shadow:0 1px 0 #fff;
+  }
+
+  /* ===== 新闻跑马灯 ===== */
+  .news-bar{
+    position:relative;
+    z-index:10;
+    margin-top:70px;
+    width:100%;
+    height:42px;
+    background:linear-gradient(90deg,var(--sun),#ffe488);
+    border-top:3px solid #fff;
+    border-bottom:3px solid #e8a800;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.2);
+  }
+  .news-label{
+    flex:0 0 auto;
+    background:#ff5b5b;
+    color:#fff;
+    font-weight:900;
+    font-size:14px;
+    padding:6px 14px;
+    height:100%;
+    display:flex;
+    align-items:center;
+    letter-spacing:2px;
+    box-shadow:2px 0 8px rgba(0,0,0,0.15);
+    z-index:2;
+  }
+  .news-track{
+    flex:1;
+    overflow:hidden;
+    position:relative;
+    height:100%;
+  }
+  .news-text{
+    position:absolute;
+    white-space:nowrap;
+    font-weight:700;
+    font-size:15px;
+    color:#7a4a00;
+    top:50%;
+    transform:translateY(-50%);
+    left:100%;
+    animation:scroll-news 16s linear infinite;
+  }
+  @keyframes scroll-news{
+    from{ left:100%; }
+    to{ left:-120%; }
+  }
+
+  /* ===== 主体内容 ===== */
+  .wrap{
+    position:relative;
+    z-index:5;
+    max-width:960px;
+    margin:0 auto;
+    padding:26px 16px 60px;
+  }
+
+  .hero{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:44px;
+    color:#fff;
+    text-shadow:0 3px 0 var(--grass-deep), 0 6px 14px rgba(0,0,0,0.35);
+    letter-spacing:3px;
+    font-weight:900;
+  }
+  .hero p{
+    margin-top:8px;
+    font-size:16px;
+    color:#fff8e6;
+    text-shadow:0 2px 6px rgba(0,0,0,0.4);
+  }
+  .version-tag{
+    display:inline-block;
+    margin-top:10px;
+    background:#ff5b5b;
+    color:#fff;
+    font-weight:800;
+    padding:4px 16px;
+    border-radius:20px;
+    font-size:14px;
+    box-shadow:0 3px 0 #c93f3f;
+  }
+
+  /* ===== 截图轮播 ===== */
+  .gallery{
+    background:var(--panel);
+    border-radius:20px;
+    padding:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    border:4px solid #ffe488;
+    margin-bottom:28px;
+  }
+  .gallery h2{
+    color:var(--sky-deep);
+    font-size:20px;
+    margin-bottom:12px;
+    text-align:center;
+    letter-spacing:1px;
+  }
+  .gallery h2::before, .gallery h2::after{
+    content:"★";
+    color:var(--sun);
+    margin:0 8px;
+  }
+  .slider{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    border-radius:14px;
+    overflow:hidden;
+    background:#000;
+  }
+  .slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 0.6s ease;
+  }
+  .slide.active{ opacity:1; }
+  .slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .slider-dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:12px;
+  }
+  .dot{
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background:#d8d0b8;
+    cursor:pointer;
+    border:2px solid #fff;
+    transition:background 0.2s;
+  }
+  .dot.active{ background:var(--sky-deep); }
+  .slider-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    background:rgba(0,0,0,0.4);
+    color:#fff;
+    border:none;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    font-size:20px;
+    cursor:pointer;
+    z-index:6;
+  }
+  .slider-btn.prev{ left:10px; }
+  .slider-btn.next{ right:10px; }
+  .slider-btn:hover{ background:rgba(0,0,0,0.65); }
+
+  /* ===== 下载区 ===== */
+  .download{
+    background:var(--panel);
+    border-radius:20px;
+    padding:24px 16px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    border:4px solid #ffe488;
+  }
+  .download h2{
+    color:var(--sky-deep);
+    font-size:22px;
+    margin-bottom:6px;
+  }
+  .download .sub{
+    color:#7a8a94;
+    font-size:13px;
+    margin-bottom:20px;
+  }
+  .btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+  }
+  .dl-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:#fff;
+    font-weight:800;
+    font-size:16px;
+    padding:14px 28px;
+    border-radius:50px;
+    box-shadow:0 5px 0 rgba(0,0,0,0.2), 0 8px 18px rgba(0,0,0,0.25);
+    transition:transform 0.15s ease;
+    min-width:220px;
+    justify-content:center;
+  }
+  .dl-btn:active{ transform:translateY(4px); box-shadow:0 1px 0 rgba(0,0,0,0.2); }
+  .dl-btn .icon{
+    width:26px;
+    height:26px;
+    flex:0 0 auto;
+  }
+  .dl-android{
+    background:linear-gradient(180deg,var(--android),var(--android-deep));
+  }
+  .dl-windows{
+    background:linear-gradient(180deg,var(--windows),var(--windows-deep));
+  }
+  .dl-btn .text{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    line-height:1.25;
+  }
+  .dl-btn .text small{
+    font-weight:500;
+    font-size:11px;
+    opacity:0.9;
+  }
+
+  footer{
+    text-align:center;
+    margin-top:26px;
+    color:#f0f0f0;
+    font-size:12px;
+    text-shadow:0 1px 4px rgba(0,0,0,0.5);
+  }
+
+  @media (max-width:520px){
+    .hero h1{ font-size:32px; }
+    .dl-btn{ min-width:100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .news-text{ animation:none; left:8px; }
+    .slide{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-logo">
+    <img src="https://simg.doyo.cn/imgfile/bgame/202504/14142902feep.png" alt="迷你世界图标">
+    <span>迷你世界</span>
+  </div>
+
+  <div class="news-bar">
+    <div class="news-label">公告</div>
+    <div class="news-track">
+      <div class="news-text">0.52.1 版本新增了皮肤并修复了错误，但遗憾的是下载客户端有所不同。):</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <h1>迷你世界</h1>
+      <p>自由创造 · 无限想象 · 星辉冒险等你来战</p>
+      <span class="version-tag">最新版本 0.52.1</span>
+    </div>
+
+    <div class="gallery">
+      <h2>游戏截图</h2>
+      <div class="slider" id="slider">
+        <div class="slide active"><img src="https://simg.doyo.cn/imgfile/bgame/202504/816230114142508vmjh.jpg" alt="截图1"></div>
+        <div class="slide"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUKSSi3aOt727x-bP4j8_PCEl-rnuc0BPzRgXbjSVj4w&s" alt="截图2"></div>
+        <div class="slide"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbN-JayJLmtTAaRNEnVRJRlyI24KKfogyO_jkrM9K0PrE58n3qfNzdv-5c&s=10" alt="截图3"></div>
+        <div class="slide"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReaEJmSYK7yAnctk0h07qO77wWBB38shrXYP8KwVDwbQ&s" alt="截图4"></div>
+        <button class="slider-btn prev" onclick="moveSlide(-1)">&#10094;</button>
+        <button class="slider-btn next" onclick="moveSlide(1)">&#10095;</button>
+      </div>
+      <div class="slider-dots" id="dots"></div>
+    </div>
+
+    <div class="download">
+      <h2>立即下载</h2>
+      <div class="sub">选择适合您设备的版本，开始你的冒险之旅</div>
+      <div class="btn-row">
+        <a class="dl-btn dl-android" href="https://www.mediafire.com/file/ti3hu7a2uail2yc/%E8%BF%B7%E4%BD%A0%E4%B8%96%E7%95%8C+0.52.1-38.apk/file" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" fill="#fff"><path d="M17.523 15.34l1.996-3.457a.398.398 0 00-.146-.545.4.4 0 00-.546.146l-2.02 3.5a12.36 12.36 0 00-9.614 0l-2.02-3.5a.4.4 0 00-.546-.146.398.398 0 00-.146.545l1.996 3.457C3.936 16.986 2.5 19.42 2.5 22.16h19c0-2.74-1.436-5.174-3.977-6.82zM7.5 19.5a1 1 0 110-2 1 1 0 010 2zm9 0a1 1 0 110-2 1 1 0 010 2zM6.5 2.5L8 5M17.5 2.5L16 5" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
+          <span class="text">安卓下载<small>Android APK · v0.52.1</small></span>
+        </a>
+        <a class="dl-btn dl-windows" href="https://www.mediafire.com/file/b3otxtspdivlnrm/%E8%BF%B7%E4%BD%A0%E4%B8%96%E7%95%8C%E6%98%9F%E8%BE%89%E9%98%810.52.1.exe" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 24 24" fill="#fff"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5-8.1L21 9v6.5l-9.5-1.1v-6zM11.5 15.6L21 16.7V22l-9.5-1.4v-5z"/></svg>
+          <span class="text">电脑下载<small>Windows EXE · 星辉冒险版</small></span>
+        </a>
+      </div>
+    </div>
+
+    <footer>© 迷你世界 0.52.1 星辉冒险版 · 本页面为粉丝制作，仅供交流学习使用</footer>
+  </div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsWrap = document.getElementById('dots');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsWrap.appendChild(d);
+  });
+  const dots = document.querySelectorAll('.dot');
+
+  function render(){
+    slides.forEach((s,i) => s.classList.toggle('active', i===current));
+    dots.forEach((d,i) => d.classList.toggle('active', i===current));
+  }
+  function moveSlide(dir){
+    current = (current + dir + slides.length) % slides.length;
+    render();
+  }
+  function goTo(i){
+    current = i;
+    render();
+  }
+  setInterval(() => moveSlide(1), 4000);
+</script>
+
+</body>
+</html>
